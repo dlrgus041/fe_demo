@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Row, Col, Card, Form, Button, Badge } from 'react-bootstrap';
 import { ChevronRight, ChatDots, ShieldLock, ListCheck, Briefcase, Cpu, PlayCircle, ArrowLeft } from 'react-bootstrap-icons';
+import {Link} from 'react-router-dom';
 
 const InterviewSetup = () => {
     // SyncTalk 테마 컬러
@@ -148,12 +149,12 @@ const InterviewSetup = () => {
                         defaultChecked
                     />
                     <div className="d-flex gap-2">
-                        <a href="/interview/voice" className="btn px-4 py-2 text-muted fw-bold" style={{ backgroundColor: '#f0f0f0' }}>
+                        <Link to="/interview/voice" className="btn px-4 py-2 text-muted fw-bold" style={{ backgroundColor: '#f0f0f0' }}>
                             음성 면접
-                        </a>
-                        <a href="/interview/chat" className="btn px-4 py-2 fw-bold d-flex align-items-center gap-2 border-0" style={{ backgroundColor: stPrimary }}>
+                        </Link>
+                        <Link to="/interview/chat" className="btn px-4 py-2 fw-bold d-flex align-items-center gap-2 border-0" style={{ backgroundColor: stPrimary }}>
                             채팅 면접
-                        </a>
+                        </Link>
                     </div>
                 </div>
 

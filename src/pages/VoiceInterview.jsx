@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Card, ProgressBar, Button, Badge } from 'react-bootstrap';
 import { Lightbulb, MicFill, MicMuteFill, GearFill, StopFill, ArrowRightCircleFill, CircleFill, ChevronRight } from 'react-bootstrap-icons';
+import {Link} from 'react-router-dom';
 
 const VoiceInterview = () => {
     const [isMuted, setIsMuted] = useState(false);
@@ -131,9 +132,9 @@ const VoiceInterview = () => {
                     {/* 네비게이션 버튼 */}
                     <div className="d-flex gap-2 mt-auto">
                         <Button variant="outline-light" className="flex-grow-1 border text-muted fw-bold py-2">잠시 중단</Button>
-                        <a href="/interview/voice/result" className="btn flex-grow-1 border-0 fw-bold py-2 d-flex align-items-center justify-content-center gap-2" style={{ backgroundColor: stPrimary }}>
+                        <Link to="/interview/voice/result" className="btn flex-grow-1 border-0 fw-bold py-2 d-flex align-items-center justify-content-center gap-2" style={{ backgroundColor: stPrimary }}>
                             결과
-                        </a>
+                        </Link>
                     </div>
                 </Col>
             </Row>

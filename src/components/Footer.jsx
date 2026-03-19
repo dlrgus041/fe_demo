@@ -9,13 +9,13 @@ const Footer = () => {
                     <Col md={6}>
                         {/* 상단 링크 메뉴 */}
                         <div className="d-flex justify-content-center gap-4 mb-3">
-                            <a href="/terms" className="text-decoration-none small text-secondary fw-medium hover-primary">
+                            <a href="#" className="text-decoration-none small text-secondary fw-medium hover-primary">
                                 이용약관
                             </a>
-                            <a href="/privacy" className="text-decoration-none small text-secondary fw-medium hover-primary">
+                            <a href="#" className="text-decoration-none small text-secondary fw-medium hover-primary">
                                 개인정보처리방침
                             </a>
-                            <a href="/support" className="text-decoration-none small text-secondary fw-medium hover-primary">
+                            <a href="#" className="text-decoration-none small text-secondary fw-medium hover-primary">
                                 고객센터
                             </a>
                         </div>

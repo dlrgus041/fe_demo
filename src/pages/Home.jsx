@@ -1,8 +1,11 @@
 import React from 'react';
-import { Container, Row, Col, Card, Button, Form, InputGroup, Nav, Navbar, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
 import { Search, FileEarmarkTextFill, MicFill, BarChartLineFill, PencilSquare, RocketTakeoffFill } from 'react-bootstrap-icons';
+import {useNavigate} from "react-router-dom";
 
 const Home = () => {
+    const navigate = useNavigate();
+
     const stPrimary = '#1976D2'; // SyncTalk 브랜드 블루
 
     return (
@@ -25,10 +28,10 @@ const Home = () => {
 
                     {/* Feature Quick Links */}
                     <div className="d-flex justify-content-center gap-3">
-                        <Button variant="white" className="btn btn-primary shadow-sm border border-light py-2 px-4 rounded-3 fw-bold d-flex align-items-center gap-2">
+                        <Button variant="white" className="btn btn-primary shadow-sm border border-light py-2 px-4 rounded-3 fw-bold d-flex align-items-center gap-2" onClick={() => navigate('/interview')}>
                             AI 모의 면접 시작
                         </Button>
-                        <Button variant="white" className="btn btn-primary shadow-sm border border-light py-2 px-4 rounded-3 fw-bold d-flex align-items-center gap-2">
+                        <Button variant="white" className="btn btn-primary shadow-sm border border-light py-2 px-4 rounded-3 fw-bold d-flex align-items-center gap-2" onClick={() => navigate('/resume')}>
                             AI 자기소개서 분석
                         </Button>
                     </div>
@@ -106,21 +109,6 @@ const Home = () => {
                     </Row>
                 </Container>
             </section>
-
-            {/* 6. Footer */}
-            <footer className="bg-white py-5 border-top border-light mt-auto">
-                <Container>
-                    <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-4">
-                        <div className="fw-bold" style={{ color: stPrimary }}>SyncTalk</div>
-                        <div className="d-flex gap-4 small text-muted">
-                            <span>이용약관</span>
-                            <span>개인정보처리방침</span>
-                            <span>고객센터</span>
-                        </div>
-                        <p className="small text-muted m-0">© 2026 SyncTalk. All rights reserved.</p>
-                    </div>
-                </Container>
-            </footer>
 
             <style>{`
         .font-korean { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; }

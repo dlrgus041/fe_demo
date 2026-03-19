@@ -1,8 +1,142 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { Container, Row, Col, Form, Button, ProgressBar, InputGroup } from 'react-bootstrap';
-import { Google, Linkedin, EyeSlash } from 'react-bootstrap-icons'; // 아이콘 패키지 설치 필요
+import { EyeSlash } from 'react-bootstrap-icons'; // 아이콘 패키지 설치 필요
+import {Link, useNavigate} from 'react-router-dom';
+import api from '../api/axios.js'
 
 const RegisterPage = () => {
+    const navigate = useNavigate();
+
+    // 비밀번호 확인
+    const [passwordCheck, setPasswordCheck] = useState('');
+
+    // 인증 코드
+    const [code, setCode] = useState('');
+
+    // 인증 코드 발송 여부
+    const [isSent, setIsSent] = useState(false);
+
+    // 인증 성공 여부
+    const [verified, setVerified] = useState(false);
+
+    // 인증 제한 시간
+    const [timer, setTimer] = useState(600); // 10분 (600초)
+
+    // 백엔드 MemberDTO 구조에 맞게 상태 설정
+    const [formData, setFormData] = useState({
+        nickname: '',   // request.getNickname()에 대응
+        email: '',      // request.getEmail()에 대응
+        password: '',   // request.getPassword()에 대응
+        provider: 'LOCAL', // 일반 가입이므로 기본값 설정
+        agreed: false,
+        // desiredJob: '',
+    });
+
+    // 타이머 로직
+    useEffect(() => {
+        let interval;
+        if (isSent && timer > 0) {
+            interval = setInterval(() => {
+                setTimer((prev) => prev - 1);
+            }, 1000);
+        } else if (timer === 0 && !verified) {
+            clearInterval(interval);
+            alert('인증 시간이 만료되었습니다. 다시 시도해주세요.');
+        }
+        return () => clearInterval(interval);
+    }, [isSent, timer]);
+
+    // 초를 분:초 형식으로 변환
+    const formatTime = (seconds) => {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m}:${s < 10 ? '0' : ''}${s}`;
+    };
+
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // 약관 동의 확인
+        if (!formData.agreed) {
+            alert("이용약관에 동의해주세요.");
+            return;
+        }
+
+        // 비밀번호 일치 확인
+        if (passwordCheck !== formData.password) {
+            alert("비밀번호가 일치하지 않습니다.")
+            return;
+        }
+
+        // 이메일 인증 여부 확인
+        if (!verified) {
+            alert("이메일 인증이 되지 않았습니다.")
+            return;
+        }
+
+        try {
+            // 작성하신 백엔드 API 주소로 데이터 전송
+            const response = await api.post('auth/signup', {
+                nickname: formData.nickname,
+                email: formData.email,
+                password: formData.password,
+                provider: formData.provider
+            });
+
+            if (response.status === 200) {
+                alert(response.data); // "회원가입이 완료되었습니다."
+                navigate('/login');    // 가입 완료 후 로그인 페이지로 이동
+            }
+        } catch (error) {
+            // 백엔드에서 던지는 400 에러(중복 아이디 등) 처리
+            const errorMessage = error.response?.data || "회원가입 중 오류가 발생했습니다.";
+            alert(errorMessage);
+        }
+    };
+
+    // 1. 인증번호 요청
+    const handleRequestCode = async () => {
+        if (formData.email == null || formData.email === '') {
+            alert("이메일을 입력해주세요.")
+            return;
+        }
+
+        try {
+            const response = await api.post('/auth/email/request', { email: formData.email });
+            setIsSent(true);
+            setTimer(600); // 타이머 리셋
+            alert(response.data);
+        } catch (error) {
+            setIsSent(false);
+            alert(error.response?.data || error.message);
+        }
+    };
+
+    // 2. 인증번호 확인
+    const handleVerifyCode = async () => {
+        if (code == null || code === '') {
+            alert("인증 코드를 입력해주세요.")
+            return;
+        }
+        try {
+            const response = await api.post('/auth/email/verify', { email: formData.email, code: code });
+            if (response.data.success) {
+                setVerified(true);
+                setIsSent(false)
+                setTimer(0)
+                alert(response.data.message);
+            }
+        } catch (error) {
+            setIsSent(false)
+            alert(error.response?.data?.message || '인증에 실패했습니다.');
+        }
+    };
+
     return (
         <Container fluid className="vh-100 p-0">
             <Row className="g-0 h-100">
@@ -52,40 +186,67 @@ const RegisterPage = () => {
                         {/*    <ProgressBar now={50} style={{ height: '6px' }} />*/}
                         {/*</div>*/}
 
-                        <Form>
-                            <Form.Group className="mb-2">
-                                <Form.Label className="small fw-semibold">이름</Form.Label>
-                                <Form.Control type="text" placeholder="홍길동" />
+                        <Form onSubmit={handleSubmit}>
+                            <Form.Group className="row mb-2">
+                                <Form.Label className="col-sm-3 col-form-label small fw-semibold">닉네임</Form.Label>
+                                <div className="col-sm-9">
+                                    <Form.Control name="nickname" type="text" placeholder="사용할 별명을 입력하세요." onChange={handleChange} required/>
+                                </div>
                             </Form.Group>
 
-                            <Form.Group className="mb-2">
-                                <Form.Label className="small fw-semibold">닉네임</Form.Label>
-                                <Form.Control type="text" placeholder="별명" />
+                            <Form.Group className="row mb-2">
+                                <Form.Label className="col-sm-3 col-form-label small fw-semibold">이메일</Form.Label>
+                                <div className="col-sm-9">
+                                    <InputGroup>
+                                        <Form.Control name="email" type="email" placeholder="로그인 시 ID로 사용됩니다." onChange={handleChange} required/>
+                                        <Button
+                                            onClick={handleRequestCode}
+                                            // disabled={isSent && timer > 0}
+                                        >{isSent ? '재발송' : '코드 보내기'}</Button>
+                                    </InputGroup>
+                                </div>
                             </Form.Group>
 
-                            <Form.Group className="mb-2">
-                                <Form.Label className="small fw-semibold">이메일</Form.Label>
-                                <Form.Control type="email" placeholder="로그인 시 ID로 사용됩니다." />
+                            <Form.Group className="row mb-2">
+                                <Form.Label className="col-sm-3 col-form-label small fw-semibold">인증 코드 입력</Form.Label>
+                                <div className="col-sm-9">
+
+                                    <InputGroup
+                                        >
+                                        <Form.Control
+                                            disabled={!isSent}
+                                            type="text"
+                                            onChange={(e) => setCode(e.target.value)} />
+                                        <Button disabled={!isSent} onClick={handleVerifyCode} > 확인
+                                        </Button>
+                                    </InputGroup>
+                                    <small>남은 시간: {formatTime(timer)}</small>
+                                </div>
                             </Form.Group>
 
-                            <Form.Group className="mb-2">
-                                <Form.Label className="small fw-semibold">비밀번호</Form.Label>
+                            <Form.Group className="row mb-2">
+                                <Form.Label className="col-sm-3 col-form-label small fw-semibold">비밀번호</Form.Label>
+                                <div className="col-sm-9">
                                 <InputGroup>
-                                    <Form.Control type="password" placeholder="최소 8자 이상" />
+                                    <Form.Control name="password" type="password" placeholder="최소 8자 이상" onChange={handleChange} required/>
                                     <InputGroup.Text className="bg-white border-start-0">
                                         <EyeSlash className="text-muted" />
                                     </InputGroup.Text>
                                 </InputGroup>
+                                </div>
                             </Form.Group>
 
-                            <Form.Group className="mb-2">
-                                <Form.Label className="small fw-semibold">비밀번호 확인</Form.Label>
+                            <Form.Group className="row mb-2">
+                                <Form.Label className="col-sm-3 col-form-label small fw-semibold">비밀번호 확인</Form.Label>
+                                <div className="col-sm-9">
                                 <InputGroup>
-                                    <Form.Control type="password" placeholder="입력한 비밀번호와 일치해야 합니다." />
+                                    <Form.Control type="password" placeholder="입력한 비밀번호와 일치해야 합니다."
+                                                  onChange={(e) => setPasswordCheck(e.target.value)} required/>
                                     <InputGroup.Text className="bg-white border-start-0">
                                         <EyeSlash className="text-muted" />
                                     </InputGroup.Text>
                                 </InputGroup>
+                                </div>
                             </Form.Group>
 
                             {/*<div className="text-center my-4 position-relative">*/}
@@ -93,11 +254,13 @@ const RegisterPage = () => {
                             {/*    <span className="position-absolute top-50 start-50 translate-middle bg-light px-2 text-muted small">커리어 선호도</span>*/}
                             {/*</div>*/}
 
-                            <Form.Group className="mb-2">
-                                <Form.Label className="small fw-semibold">관심직무</Form.Label>
+                            <Form.Group className="row mb-2">
+                                <Form.Label className="col-sm-3 col-form-label small fw-semibold">관심직무</Form.Label>
+                                <div className="col-sm-9">
                                 <Form.Select className="text-muted">
-                                    <option>직무를 선택하세요...</option>
+                                    <option>직무를 선택하세요.</option>
                                 </Form.Select>
+                                </div>
                             </Form.Group>
 
                             {/*<div className="mb-4">*/}
@@ -111,13 +274,24 @@ const RegisterPage = () => {
                             {/*    </div>*/}
                             {/*</div>*/}
 
-                            <Form.Group className="mb-4" controlId="terms">
-                                <Form.Check type="checkbox" label={<span className="small"><span className="text-primary text-decoration-underline">이용약관</span> 및 <span className="text-primary text-decoration-underline">개인정보 처리방침</span>에 동의합니다.</span>} />
-                            </Form.Group>
+                            {/*<Form.Group className="mb-4" controlId="terms">*/}
+                            {/*    <Form.Check onChange={handleChange} name="agreed" required type="checkbox" label={<span className="small"><span className="text-primary text-decoration-underline">이용약관</span> 및 <span className="text-primary text-decoration-underline">개인정보 처리방침</span>에 동의합니다.</span>} />*/}
+                            {/*</Form.Group>*/}
 
-                            <Button variant="primary" className="w-100 py-2 mb-4 fw-bold" style={{ backgroundColor: '#1976D2' }}>
+                            <Form.Check className="mb-4 small">
+                                <Form.Check.Input
+                                    type="checkbox"
+                                    name="agreed"
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <Form.Check.Label>이용약관 및 개인정보 처리방침에 동의합니다.</Form.Check.Label>
+                            </Form.Check>
+
+                            <Button variant="primary" className="w-100 py-2 mb-4 fw-bold" style={{ backgroundColor: '#1976D2' }} type="submit">
                                 회원가입 완료
                             </Button>
+                        </Form>
 
                             {/*<div className="text-center mb-4 position-relative">*/}
                             {/*    <hr />*/}
@@ -137,10 +311,9 @@ const RegisterPage = () => {
                             {/*    </Col>*/}
                             {/*</Row>*/}
 
-                            <div className="text-center mt-4 small">
-                                이미 계정이 있으신가요? <a href="/login" className="text-primary fw-bold text-decoration-none">로그인</a>
-                            </div>
-                        </Form>
+                        <div className="text-center mt-4 small">
+                            이미 계정이 있으신가요? <Link to="/login" className="text-primary fw-bold text-decoration-none">로그인</Link>
+                        </div>
                     </div>
                 </Col>
             </Row>

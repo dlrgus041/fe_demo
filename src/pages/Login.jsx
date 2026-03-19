@@ -1,11 +1,49 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Container, Row, Col, Form, Button, InputGroup } from 'react-bootstrap';
-import { Google, Linkedin, EyeSlash, Person, Envelope, Lock } from 'react-bootstrap-icons';
+import { EyeSlash, Envelope, Lock } from 'react-bootstrap-icons';
 import {RiKakaoTalkFill} from "react-icons/ri";
 import {FcGoogle} from "react-icons/fc";
 import {FaGithub} from "react-icons/fa";
+import {Link, useNavigate} from 'react-router-dom';
+import api from '../api/axios.js'
 
 const Login = () => {
+
+    const navigate = useNavigate();
+    const [loginData, setLoginData] = useState({ email: '', password: '' });
+
+    const handleChange = (e) => {
+        setLoginData({ ...loginData, [e.target.name]: e.target.value });
+    };
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await api.post('/auth/login', loginData);
+
+            localStorage.setItem('accessToken', response.data.accessToken);
+            localStorage.setItem('refreshToken', response.data.refreshToken);
+            localStorage.setItem('role', response.data.role);
+            localStorage.setItem('email', response.data.email);
+            localStorage.setItem('nickname', response.data.nickname);
+
+            alert("로그인 성공!");
+            navigate('/');
+        } catch (error) {
+            console.error(error);
+            alert("로그인 실패: 이메일 또는 비밀번호를 확인하세요.");
+        }
+    };
+
+    const handleSocialLogin = (provider) => {
+        // 백엔드 서버 주소 (Spring Security 기본 엔드포인트)
+        // provider: google, kakao, naver
+        const backendUrl = `http://localhost:8081/oauth2/authorization/${provider}`;
+
+        // 현재 창의 주소를 백엔드로 이동시켜 인증 프로세스 시작
+        window.location.href = backendUrl;
+    };
+
     return (
         <Container fluid className="vh-100 p-0 overflow-hidden">
             <Row className="g-0 h-100">
@@ -34,7 +72,7 @@ const Login = () => {
                             <p className="text-muted small">등록된 계정 정보를 입력해주세요.</p>
                         </div>
 
-                        <Form>
+                        <Form onSubmit={handleLogin}>
                             {/* 이메일 입력 (세로형 라벨 + 아이콘) */}
                             <Form.Group className="mb-3">
                                 <Form.Label className="small fw-semibold text-dark">이메일</Form.Label>
@@ -42,7 +80,7 @@ const Login = () => {
                                     <InputGroup.Text className="bg-white border-0">
                                         <Envelope className="text-muted" size={18} />
                                     </InputGroup.Text>
-                                    <Form.Control type="email" placeholder="name@company.com" className="border-0 ps-0" />
+                                    <Form.Control type="email" placeholder="name@company.com" className="border-0 ps-0" onChange={handleChange} />
                                 </InputGroup>
                             </Form.Group>
 
@@ -53,7 +91,7 @@ const Login = () => {
                                     <InputGroup.Text className="bg-white border-0">
                                         <Lock className="text-muted" size={18} />
                                     </InputGroup.Text>
-                                    <Form.Control type="password" placeholder="비밀번호를 입력하세요" className="border-0 ps-0 border-end-0" />
+                                    <Form.Control type="password" placeholder="비밀번호를 입력하세요" className="border-0 ps-0 border-end-0" onChange={handleChange} />
                                     <InputGroup.Text className="bg-white border-0">
                                         <EyeSlash className="text-muted" size={18} />
                                     </InputGroup.Text>
@@ -61,19 +99,20 @@ const Login = () => {
                             </Form.Group>
 
                             {/* 로그인 상태 유지 및 비밀번호 찾기 (이미지 요소 유지) */}
-                            <div className="d-flex justify-content-between align-items-center mb-4">
-                                <Form.Check
-                                    type="checkbox"
-                                    id="remember-me"
-                                    label={<span className="text-muted" style={{ fontSize: '0.8rem' }}>로그인 상태 유지</span>}
-                                />
-                                <a href="/forgot-password" style={{ fontSize: '0.8rem' }} className="fw-bold text-primary text-decoration-none">비밀번호를 잊으셨나요?</a>
-                            </div>
+                            {/*<div className="d-flex justify-content-between align-items-center mb-4">*/}
+                            {/*    <Form.Check*/}
+                            {/*        type="checkbox"*/}
+                            {/*        id="remember-me"*/}
+                            {/*        label={<span className="text-muted" style={{ fontSize: '0.8rem' }}>로그인 상태 유지</span>}*/}
+                            {/*    />*/}
+                            {/*    <a href="/forgot-password" style={{ fontSize: '0.8rem' }} className="fw-bold text-primary text-decoration-none">비밀번호를 잊으셨나요?</a>*/}
+                            {/*</div>*/}
 
                             {/* 로그인 버튼 (Primary 블루 적용) */}
-                            <Button variant="primary" className="w-100 py-2 fw-bold mb-4 shadow-sm">
+                            <Button type="submit" variant="primary" className="mt-4 w-100 py-2 fw-bold mb-4 shadow-sm">
                                 로그인하기
                             </Button>
+                        </Form>
 
                             {/* 구분선 (이미지 스타일 유지) */}
                             <div className="text-center mb-4 position-relative">
@@ -89,7 +128,8 @@ const Login = () => {
                                 <button className="btn btn-outline-secondary rounded-circle p-0 d-flex align-items-center justify-content-center m-2"
                                         style={{ width: '60px', height: '60px', backgroundColor: "white", border: "none" }}
                                         title="Google 로그인"
-                                        type="button">
+                                        type="button"
+                                        onClick={() => handleSocialLogin('google')}>
                                     <FcGoogle size={24} />
                                 </button>
 
@@ -97,7 +137,8 @@ const Login = () => {
                                 <button className="btn rounded-circle p-0 d-flex align-items-center justify-content-center m-2"
                                         style={{ width: '60px', height: '60px', backgroundColor: '#FEE500', color: '#191919', border: 'none' }}
                                         title="카카오 로그인"
-                                        type="button">
+                                        type="button"
+                                        onClick={() => handleSocialLogin('kakao')}>
                                     <RiKakaoTalkFill size={26} />
                                 </button>
 
@@ -105,16 +146,16 @@ const Login = () => {
                                 <button className="btn btn-dark rounded-circle p-0 d-flex align-items-center justify-content-center border-secondary m-2"
                                         style={{ width: '60px', height: '60px', backgroundColor: '#24292f', borderColor: '#30363d' }}
                                         title="GitHub 로그인"
-                                        type="button">
+                                        type="button"
+                                        onClick={() => handleSocialLogin('github')}>
                                     <FaGithub size={24} className="text-white" />
                                 </button>
                             </div>
 
                             {/* 회원가입 링크 (Primary 블루 적용) */}
                             <div className="text-center small">
-                                아직 회원이 아니신가요? <a href="/signup" className="fw-bold text-primary text-decoration-none">지금 회원가입</a>
+                                아직 회원이 아니신가요? <Link to="/signup" className="fw-bold text-primary text-decoration-none">지금 회원가입</Link>
                             </div>
-                        </Form>
                     </div>
                 </Col>
             </Row>

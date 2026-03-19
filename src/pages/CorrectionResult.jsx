@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Row, Col, Card, Badge, Button } from 'react-bootstrap';
 import { Bullseye, CheckCircle, Lightbulb, People, Tools, GraphUp, ChevronRight, FileEarmarkTextFill } from 'react-bootstrap-icons';
+import {Link} from 'react-router-dom';
 
 const CorrectionResult = () => {
     // SyncTalk 메인 컬러 스키마 정의
@@ -111,19 +112,12 @@ const CorrectionResult = () => {
 
                 {/* 하단 버튼 액션 바 */}
                 <div className="d-flex justify-content-center gap-3 border-top pt-4">
-                    <Button variant="outline-primary" className="px-5 py-2 fw-bold" style={{ color: stPrimary, borderColor: stPrimary }}>
+                    <Link to="/correction/report" variant="outline-primary" className="btn px-5 py-2 fw-bold" style={{ color: stPrimary, borderColor: stPrimary }}>
                         다시 첨삭하기
-                    </Button>
-                    <Button variant="primary" className="px-5 py-2 fw-bold border-0" style={{ backgroundColor: stPrimary }}>
-                        최종 본으로 저장
-                    </Button>
+                    </Link>
                 </div>
 
             </Container>
-
-            <div className="text-center mt-4 text-muted small">
-                © 2026 SyncTalk Resume Intelligence. All rights reserved.
-            </div>
         </div>
     );
 };

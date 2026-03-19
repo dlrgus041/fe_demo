@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Row, Col, Card, ProgressBar, Button, Badge } from 'react-bootstrap';
 import { FileEarmarkPdf, ArrowRepeat, CheckCircleFill, ExclamationTriangleFill, LightbulbFill, ArrowRight } from 'react-bootstrap-icons';
+import {Link} from 'react-router-dom';
 
 const CorrectionReport = () => {
     return (
@@ -134,9 +135,9 @@ const CorrectionReport = () => {
                             <p className="m-0 small text-white-50">첨삭된 자소서를 기반으로 생성된 예상 질문으로 실전처럼 연습할 수 있습니다.</p>
                         </div>
                     </div>
-                    <Button variant="primary" className="fw-bold d-flex align-items-center gap-2" style={{ backgroundColor: '#1976D2' }}>
-                        AI 면접 시작하기 <ArrowRight />
-                    </Button>
+                    <Link to="/correction/result" className="btn btn-primary fw-bold d-flex align-items-center gap-2" style={{ backgroundColor: '#1976D2' }}>
+                        분석 결과 보기 <ArrowRight />
+                    </Link>
                 </div>
 
             </Container>

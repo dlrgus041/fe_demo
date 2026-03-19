@@ -11,18 +11,21 @@ import ChatInterviewResult from "./pages/ChatInterviewResult.jsx";
 import VoiceInterview from "./pages/VoiceInterview.jsx";
 import ChatInterview from "./pages/ChatInterview.jsx";
 import VoiceInterviewResult from "./pages/VoiceInterviewResult.jsx";
-import {Link, Route, Routes} from "react-router-dom";
+import {HashRouter, Link, Route, Routes} from "react-router-dom";
 import Home from "./pages/Home.jsx";
 import MyPage from "./pages/Mypage.jsx";
 import Signup from "./pages/Signup.jsx";
+import LogDashboard from "./pages/LogDashboard.jsx";
 
 const App = () => {
     return (
         <>
-            <Navbar />
+            {/*<Navbar />*/}
             <Routes>
-                {/* 메인 홈 (중복 제거) */}
-                <Route path="/" element={<Home />} />
+                {/* 메인 홈 */}
+                {/*<Route path="/" element={<Home />} />*/}
+
+                <Route path="/" element={<LogDashboard />} />
 
                 {/* 로그인 */}
                 <Route path="/login" element={<Login />} />
@@ -31,6 +34,7 @@ const App = () => {
                 {/* 자소서 첨삭 관련 */}
                 <Route path="/correction" element={<CorrectionInput />} />
                 <Route path="/correction/report" element={<CorrectionReport />} />
+                <Route path="/correction/result" element={<CorrectionResult />} />
 
                 {/* 면접 관련 */}
                 <Route path="/interview" element={<InterviewSetup />} />
@@ -42,7 +46,7 @@ const App = () => {
                 {/* 마이페이지 */}
                 <Route path="/mypage" element={<MyPage />} />
             </Routes>
-            <Footer />
+            {/*<Footer />*/}
         </>
     );
 };

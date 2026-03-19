@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Row, Col, Card, Form, Button, ProgressBar, Badge } from 'react-bootstrap';
 import { SendFill, MicFill, LightbulbFill, BoxArrowRight, PersonCircle } from 'react-bootstrap-icons';
+import {Link} from 'react-router-dom';
 
 const ChatInterview = () => {
     const stPrimary = '#1976D2';
@@ -100,9 +101,9 @@ const ChatInterview = () => {
                         </p>
                     </Card>
 
-                    <a href="/interview/chat/result" className="btn w-100 border py-3 text-dark fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm rounded-3 mt-auto">
+                    <Link to="/interview/chat/result" className="btn w-100 border py-3 text-dark fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm rounded-3 mt-auto">
                         결과
-                    </a>
+                    </Link>
                 </Col>
             </Row>
         </div>

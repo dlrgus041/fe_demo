@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Row, Col, Form, Button, Badge, Card } from 'react-bootstrap';
 import { Briefcase, FileEarmarkText, CloudArrowUp, Magic, TypeBold, TypeItalic, TypeUnderline, ListUl, CheckCircleFill } from 'react-bootstrap-icons';
+import {Link} from 'react-router-dom';
 
 const CorrectionInput = () => {
     return (
@@ -90,9 +91,9 @@ const CorrectionInput = () => {
                         <Button variant="outline-secondary" className="px-4 py-2 border-secondary border-opacity-25 bg-white fw-medium">
                             임시 저장
                         </Button>
-                        <a href="/correction/report" className="btn btn-primary px-4 py-2 fw-bold d-flex align-items-center gap-2" style={{ backgroundColor: '#1976D2' }}>
+                        <Link to="/correction/report" className="btn btn-primary px-4 py-2 fw-bold d-flex align-items-center gap-2" style={{ backgroundColor: '#1976D2' }}>
                             <Magic /> AI 첨삭 받기
-                        </a>
+                        </Link>
                     </div>
                 </div>
 
